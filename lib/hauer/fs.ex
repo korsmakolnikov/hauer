@@ -23,7 +23,7 @@ defmodule Hauer.FS do
     "#{get_resources_dir()}/#{resource_name}.ex"
   end
 
-  def add_resource(resource_name) do
+  def add_resource(resource_name, resource_content) do
     create_resources_dir()
 
     resource_file_path = get_resource_dir(resource_name)
@@ -34,6 +34,7 @@ defmodule Hauer.FS do
         {:error, "Resource file already exists: #{resource_file_path}"}
       _ ->
         File.touch!(resource_file_path)
+        File.write!(resource_file_path, resource_content)
         {:ok, resource_file_path}
     end
   end
