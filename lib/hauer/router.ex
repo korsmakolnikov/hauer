@@ -2,20 +2,16 @@ defmodule Hauer.Router do
   use Plug.Router
 
   require Hauer.Dsl.Resource
-  require Hauer.Dsl.Wrappers
-  alias Hauer.Dsl.Resource, as: Dsl
-  alias Hauer.Configuration
+  alias Hauer.Dsl.Resource
 
   plug(:match)
   plug(:dispatch)
-  parsed = Configuration.read()
-  resources = Configuration.parse_conf(parsed[:resources])
 
-  get "/" do
+  get "/healt-check" do
     conn |> send_resp(200, ":ok")
   end
 
-  Dsl.map_resources(resources)
+  Resource.map_resources()
 
   match _ do
     send_resp(conn, 404, "Yikes! 404")

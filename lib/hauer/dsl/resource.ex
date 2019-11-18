@@ -3,9 +3,9 @@ defmodule Hauer.Dsl.Resource do
   Resource wrapper that takes defined resources and generates code
   """
 
-  require Hauer.Dsl.Wrappers
+  alias Hauer.Configuration
 
-  alias Hauer.Dsl.Wrappers, as: Wrappers
+  @resources_dir Application.get_env(:hauer, :resources_dir)
 
   defmacro map_resources([]) do
     quote do
@@ -13,11 +13,16 @@ defmodule Hauer.Dsl.Resource do
     end
   end
 
-  defmacro map_resources(route_list) do
-    quote do
-      for route <- unquote(route_list) do
-        IO.puts("Plugging route #{route}")
-        Wrappers.generate_route(route)
+  defmacro map_resources() do
+    parsed = Configuration.read()
+    resources = Configuration.parse_conf(parsed[:resources])
+
+    for r <- resources do
+      module = Atom.to_string(r)
+      quote do
+        get "/#{unquote(module)}" do
+          send_resp(var!(conn), 200, apply(:"Hauer.#{unquote(@resources_dir)}.#{unquote(module)}", :get, []))
+        end
       end
     end
   end
