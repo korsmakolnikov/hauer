@@ -3,8 +3,9 @@ defmodule Hauer.Dsl.Middleware do
   This module scaffold middleware.
   Do not use macro to generate code.
   """
+  @resources_dir Application.get_env(:hauer, :resources_dir)
 
-  @verbs ["get", "post", "head", "put", "delete", "patch"]
+  @verbs ["get", "post", "put", "delete", "patch"]
 
   def generate_module(module_name) when is_bitstring(module_name) do
     open_module(module_name) <> generate_methods() <> close_block()
@@ -17,7 +18,9 @@ defmodule Hauer.Dsl.Middleware do
 
   def open_module(module_name) do
     capitalized_module_name = String.capitalize module_name
-    "defmodule #{capitalized_module_name} do\n"
+    capitalized_resources_dir = String.capitalize @resources_dir
+    
+    "defmodule Hauer.#{capitalized_resources_dir}.#{capitalized_module_name} do\n"
   end
 
   def close_block do
@@ -34,7 +37,7 @@ defmodule Hauer.Dsl.Middleware do
   
   def generate_method(method_name) when is_bitstring(method_name) do
     mn = "#{method_name}_action"
-    "def #{mn}(), do: :ok"
+    "def #{mn}(), do: \"ok\""
   end
 
   def generate_method(_), do: raise "Dave, I need a name (string) to build method name!"
